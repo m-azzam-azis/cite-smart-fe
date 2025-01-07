@@ -18,7 +18,7 @@ export default function Home() {
         description: message,
       });
     }
-  }, [status, message]);
+  }, [status, message, toast]);
 
   return (
     <div className="w-full h-screen bg-red-200">

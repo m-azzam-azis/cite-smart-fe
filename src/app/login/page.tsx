@@ -19,7 +19,7 @@ export default function LoginPage() {
         description: message,
       });
     }
-  }, [status, message]);
+  }, [status, message, toast]);
 
   return (
     <div className="h-full grid place-items-center">
