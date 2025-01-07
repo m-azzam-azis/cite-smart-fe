@@ -5,44 +5,29 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
 
-export async function login(formData: FormData) {
-  const supabase = await createClient();
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
-
-  const { error } = await supabase.auth.signInWithPassword(data);
-  console.log(error);
-
-  if (error) {
-    redirect("/error");
-  }
-
-  revalidatePath("/", "layout");
-  redirect("/");
-}
-
 export async function signup(formData: FormData) {
   const supabase = await createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const passwordConfirm = formData.get("password-confirm") as string;
 
-  const { error } = await supabase.auth.signUp(data);
-  console.log(error);
-
-  if (error) {
-    redirect("/error");
+  if (!email || !password || !passwordConfirm) {
+    redirect("/signup?status=error&message=Email and password are required.");
+    return;
+  }
+  if (password != passwordConfirm) {
+    redirect("/signup?status=error&message=Password doesn't match.");
+    return;
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  const { error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    redirect(
+      `/signup?status=error&message=${encodeURIComponent(error.message)}`
+    );
+  } else {
+    revalidatePath("/", "layout");
+    redirect("/login?status=success&message=Signed up successfully.");
+  }
 }

@@ -1,8 +1,26 @@
+"use client";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 import { signup } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function LoginPage() {
+export default function SigninPage() {
+  const searchParams = useSearchParams();
+  const status = searchParams.get("status");
+  const message = searchParams.get("message");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (status && message) {
+      toast({
+        title: status === "success" ? "Success" : "Error",
+        description: message,
+      });
+    }
+  }, [status, message]);
+
   return (
     <div className="h-full grid place-items-center">
       <form className="mx-auto w-1/2 my-auto h-1/2 flex flex-col gap-4">
@@ -10,6 +28,8 @@ export default function LoginPage() {
         <Input id="email" name="email" type="email" required />
         <label htmlFor="password">Password:</label>
         <Input id="password" name="password" type="password" required />
+        <label htmlFor="password-confirm">Retype your Password:</label>
+        <Input id="password" name="password-confirm" type="password" required />
         <Button className="w-1/4" formAction={signup}>
           Sign up
         </Button>
