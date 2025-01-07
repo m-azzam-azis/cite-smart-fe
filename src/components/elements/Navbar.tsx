@@ -34,29 +34,45 @@ const Navbar = () => {
 
     setLoggedIn(false);
     // Show toast notification for logout
-    toast({ title: "Logged out", description: "success" });
+    toast({ title: "Logged out", description: "success", variant: "success" });
   };
 
   return (
-    <nav className="w-full top-0 bg-blue-300 px-4 py-2 sticky flex justify-between z-[9999]">
-      <Link href={"/"}>Cite Smart</Link>
+    <nav className="w-full top-0 bg-white border-b border-gray-200 px-6 py-4 sticky flex justify-between items-center z-[9999] shadow-sm">
+      <Link
+        href={"/"}
+        className="text-2xl font-semibold text-primary hover:text-primary-600 transition-colors"
+      >
+        Cite Smart
+      </Link>
       <div>
-        <ul className="flex gap-4">
+        <ul className="flex gap-4 items-center">
           {loggedIn ? (
             <li>
-              <Button onClick={handleLogout}>Logout</Button>
+              <Button
+                onClick={handleLogout}
+                size={"lg"}
+                variant="outline"
+                className="hover:bg-red-50 hover:text-red-600 transition-colors"
+              >
+                Logout
+              </Button>
             </li>
           ) : (
             <>
               <li>
-                <Button>
-                  <Link href={"/login"}>Login</Link>
-                </Button>
+                <Link href={"/login"}>
+                  <Button size={"lg"} variant="outline">
+                    Login
+                  </Button>
+                </Link>
               </li>
               <li>
-                <Button>
-                  <Link href={"/signup"}>Sign Up</Link>
-                </Button>
+                <Link href={"/signup"}>
+                  <Button size={"lg"} variant="secondary">
+                    Sign up
+                  </Button>
+                </Link>
               </li>
             </>
           )}

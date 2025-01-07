@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/elements/Navbar";
+import Footer from "@/components/elements/Footer";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from "react";
@@ -31,9 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
-        <main>
+        <main className="min-h-screen">
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </main>
+        <Footer />
         <Toaster />
       </body>
     </html>
