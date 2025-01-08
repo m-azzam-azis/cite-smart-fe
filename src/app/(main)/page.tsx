@@ -39,9 +39,9 @@ function HomeContent() {
             Streamline your research with AI-powered citation suggestions based
             on your paper&apos;s content.
           </p>
-          <Link href={"/login"}>
+          <Link href={"/dashboard"}>
             <button className="px-4 py-2 backdrop-blur-sm border bg-primary-300/10 border-primary-500/20 text-black mx-auto text-center rounded-full relative mt-4">
-              <span>Join now →</span>
+              <span>Create new project +</span>
               <div className="absolute inset-x-0  h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-primary-500 to-transparent text-black" />
             </button>
           </Link>

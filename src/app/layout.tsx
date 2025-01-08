@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Navbar from "@/components/elements/Navbar";
-import Footer from "@/components/elements/Footer";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        <main className="min-h-screen">
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-        </main>
-        <Footer />
-        <Toaster />
+        <AuthProvider>
+          <main className="min-h-screen">
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          </main>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
