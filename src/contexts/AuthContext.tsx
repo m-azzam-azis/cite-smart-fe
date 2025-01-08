@@ -2,40 +2,61 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 type AuthContextType = {
   isLoggedIn: boolean;
+  user: User | null;
+  error: Error | null;
   setIsLoggedIn: (value: boolean) => void;
+  supabase: ReturnType<typeof createClient>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  // Listen for auth changes
+  const supabase = createClient();
 
+  // Check initial auth state
+  supabase.auth.getUser().then(({ data, error }) => {
+    if (error) {
+      setError(error);
+      setIsLoggedIn(false);
+      setUser(null);
+    } else {
+      // Check if we got a user
+      const loggedIn = !!data?.user;
+      setIsLoggedIn(loggedIn);
+      setUser(data?.user || null);
+      setError(null);
+    }
+  });
   useEffect(() => {
-    const supabase = createClient();
-    
-    // Check initial auth state
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session);
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (_event === "SIGNED_OUT") {
+        setIsLoggedIn(false);
+        setUser(null);
+      } else if (_event === "SIGNED_IN") {
+        setIsLoggedIn(true);
+        setUser(session?.user || null);
+      }
+      setError(null);
     });
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session);
-    });
+  const value = {
+    isLoggedIn,
+    user,
+    error,
+    setIsLoggedIn,
+    supabase,
+  };
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { login } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ToastHandler } from "@/lib/toast-handler";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -71,6 +72,7 @@ export default function LoginPage() {
           </Button>
         </form>
       </div>
+      <ToastHandler />
     </div>
   );
 }

@@ -6,24 +6,26 @@ import Link from "next/link";
 import { IconSearch, IconBook, IconQuote } from "@tabler/icons-react";
 import { FlipWords } from "@/components/ui/flip-words";
 import { HeroHighlight } from "@/components/ui/hero-highlight";
+import { ToastHandler } from "@/lib/toast-handler";
 
 const WORDS = ["Students", "Researchers", "Academics", "Professionals"];
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
+  const paramTitle = searchParams.get("title");
   const message = searchParams.get("message");
   const { toast } = useToast();
 
   useEffect(() => {
     if (status && message) {
       toast({
-        title: status === "success" ? "Success" : "Error",
+        title: status === "success" ? paramTitle || "Success" : "Error",
         description: message,
         variant: status === "success" ? "success" : "destructive",
       });
     }
-  }, [status, message, toast]);
+  }, [status, message, toast, paramTitle]); //eslint-disable react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -41,7 +43,7 @@ function HomeContent() {
           </p>
           <Link href={"/dashboard"}>
             <button className="px-4 py-2 backdrop-blur-sm border bg-primary-300/10 border-primary-500/20 text-black mx-auto text-center rounded-full relative mt-4">
-              <span>Create new project +</span>
+              <span>Start now +</span>
               <div className="absolute inset-x-0  h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-primary-500 to-transparent text-black" />
             </button>
           </Link>
@@ -92,6 +94,7 @@ export default function Home() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <HomeContent />
+      <ToastHandler />
     </Suspense>
   );
 }

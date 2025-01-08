@@ -43,8 +43,8 @@ export default function RootLayout({
               {children}
             </Suspense>
           </main>
-          <Toaster />
         </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>

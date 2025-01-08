@@ -48,8 +48,8 @@ export default function SignupPage() {
               Password confirmation
             </label>
             <Input
-              id="password-confirmation"
-              name="password-confirmation"
+              id="password-confirm"
+              name="password-confirm"
               type="password"
               minLength={6}
               required

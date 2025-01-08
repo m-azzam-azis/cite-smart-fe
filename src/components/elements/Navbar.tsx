@@ -1,20 +1,29 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const { isLoggedIn, user, supabase } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { toast } = useToast();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    setIsLoggedIn(false);
-    toast({ title: "Logged out", description: "success" });
+    setIsLoggingOut(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        toast({
+          title: "Logged out",
+          description: `See you later, ${user?.email}!`,
+          variant: "success",
+        });
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -33,9 +42,17 @@ const Navbar = () => {
                 onClick={handleLogout}
                 size={"lg"}
                 variant="outline"
-                className="hover:bg-red-50 hover:text-red-600 transition-colors"
+                disabled={isLoggingOut}
+                className="hover:bg-red-50 hover:text-red-600 transition-colors min-w-[100px]"
               >
-                Logout
+                {isLoggingOut ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Logging out...
+                  </div>
+                ) : (
+                  "Logout"
+                )}
               </Button>
             </li>
           ) : (
