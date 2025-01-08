@@ -32,7 +32,15 @@ export default function RootLayout({
       >
         <AuthProvider>
           <main className="min-h-screen">
-            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            <Suspense
+              fallback={
+                <div className="h-screen text-center grid place-items-center">
+                  Loading...
+                </div>
+              }
+            >
+              {children}
+            </Suspense>
           </main>
           <Toaster />
         </AuthProvider>
