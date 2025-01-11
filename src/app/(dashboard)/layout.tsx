@@ -1,4 +1,4 @@
-import DashboardSidebar from "@/modules/Dashboard";
+import DashboardSidebar from "@/components/elements/Sidebar";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
@@ -15,7 +15,7 @@ export default async function RootLayout({
     redirect("/login");
   }
   return (
-    <div className="flex w-full h-screen">
+    <div className="md:flex w-full h-screen">
       <DashboardSidebar />
       {children}
     </div>

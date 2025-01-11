@@ -28,12 +28,20 @@ const Navbar = () => {
 
   return (
     <nav className="w-full top-0 bg-white border-b border-gray-200 px-6 py-4 sticky flex justify-between items-center z-[9999] shadow-sm">
-      <Link
-        href={"/"}
-        className="text-2xl font-semibold text-primary hover:text-primary-600 transition-colors"
-      >
-        Cite Smart
-      </Link>
+      <div className="flex items-center justify-center">
+        <Link
+          href={"/"}
+          className="text-2xl font-semibold text-primary hover:text-primary-600 transition-colors"
+        >
+          Cite Smart
+        </Link>
+        <Link
+          href={"/dashboard"}
+          className="ml-12 hover:text-gray-700 hover:-translate-y-1 transition-all"
+        >
+          Dashboard
+        </Link>
+      </div>
       <div>
         <ul className="flex gap-4 items-center">
           {isLoggedIn ? (
