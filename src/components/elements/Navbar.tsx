@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +10,7 @@ const Navbar = () => {
   const { isLoggedIn, user, supabase } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -20,6 +22,8 @@ const Navbar = () => {
           description: `See you later, ${user?.email}!`,
           variant: "success",
         });
+        router.push("/");
+        router.refresh();
       }
     } finally {
       setIsLoggingOut(false);

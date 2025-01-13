@@ -16,37 +16,70 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined); // Change initial state to undefined
   const [error, setError] = useState<Error | null>(null);
-  // Listen for auth changes
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient()); // Memoize supabase client
 
-  // Check initial auth state
-  supabase.auth.getUser().then(({ data, error }) => {
-    if (error) {
-      setError(error);
-      setIsLoggedIn(false);
-      setUser(null);
-    } else {
-      // Check if we got a user
-      const loggedIn = !!data?.user;
-      setIsLoggedIn(loggedIn);
-      setUser(data?.user || null);
-      setError(null);
-    }
-  });
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (_event === "SIGNED_OUT") {
+    let interval: NodeJS.Timeout | null = null;
+
+    const checkSession = async () => {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+      if (sessionError) {
+        setError(sessionError);
         setIsLoggedIn(false);
         setUser(null);
-      } else if (_event === "SIGNED_IN") {
+        return false;
+      } else if (session?.user) {
         setIsLoggedIn(true);
-        setUser(session?.user || null);
+        setUser(session.user);
+        setError(null);
+        return true;
       }
-      setError(null);
+      return false;
+    };
+
+    // Initial check
+    checkSession().then((hasUser) => {
+      // If no user found, start interval
+      if (!hasUser) {
+        interval = setInterval(async () => {
+          const found = await checkSession();
+          if (found && interval) {
+            clearInterval(interval);
+          }
+        }, 1000); // Check every second
+      }
     });
-  }, []); //eslint-disable-line react-hooks/exhaustive-deps
+
+    // Set up auth state listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setIsLoggedIn(!!session?.user);
+      setUser(session?.user || null);
+      setError(null);
+
+      // Clear interval if it exists when user is found
+      if (session?.user && interval) {
+        clearInterval(interval);
+      }
+    });
+
+    // Cleanup subscription
+    return () => {
+      if (interval) clearInterval(interval);
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]); // Only depend on supabase.auth
+
+  // Show nothing while initial check is happening
+  if (user === undefined) {
+    return null;
+  }
 
   const value = {
     isLoggedIn,

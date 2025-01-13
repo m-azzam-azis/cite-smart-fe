@@ -6,11 +6,51 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { SearchResponse } from "./interfaces";
+import { gqlRequest } from "@/utils/graphql";
+
+const searchPapers = async (input: {
+  uid: string | null;
+  title: string;
+  keywords: string[];
+}): Promise<SearchResponse | null> => {
+  try {
+    return await gqlRequest<SearchResponse>(
+      `
+        query {
+          searchAndStorePapers(input: {
+            uid: "${input.uid || ""}"
+            title: "${input.title}"
+            keywords: ${JSON.stringify(input.keywords)}
+          }) {
+            title
+            similarityScore
+            citations {
+              title
+              id
+              authors
+              similarityScore
+            }
+          }
+        }
+      `
+    );
+  } catch (error) {
+    console.error("GraphQL Errors:", error);
+    return null;
+  }
+};
 
 export default function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [keyword, setKeyword] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const handleAddKeyword = () => {
     if (!keyword.trim()) return;
@@ -21,8 +61,8 @@ export default function NewProjectPage() {
   const handleRemoveKeyword = (indexToRemove: number) => {
     setKeywords(keywords.filter((_, index) => index !== indexToRemove));
   };
-  const { toast } = useToast();
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || keywords.length === 0) {
       toast({
@@ -33,11 +73,32 @@ export default function NewProjectPage() {
       return;
     }
 
-    // Handle form submission here
-    toast({
-      title: "Success",
-      description: "Project created successfully",
-    });
+    setLoading(true);
+    try {
+      const result = await searchPapers({
+        uid: user?.id || null,
+        title: title,
+        keywords: keywords,
+      });
+
+      if (result) {
+        toast({
+          title: "Success",
+          description: "Project created successfully",
+        });
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Error creating project:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create project",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,8 +150,15 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            Create Project
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Creating Project...
+              </div>
+            ) : (
+              "Create Project"
+            )}
           </Button>
         </form>
       </Card>

@@ -1,10 +1,35 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DUMMY_PROJECTS } from "./constants";
 import { IconPlus, IconBooks, IconClock } from "@tabler/icons-react";
+import { useProjects } from "@/contexts/ProjectContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
+
+const formatKeywords = (keywords: string): string[] => {
+  return keywords ? keywords.split(",").map((kw) => kw.trim()) : [];
+};
 
 export default function DashboardPage() {
-  const hasProjects = DUMMY_PROJECTS.length > 0;
+  const { projects, loading, refetchProjects } = useProjects();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      refetchProjects();
+    }
+  }, [user, refetchProjects]);
+
+  useEffect(() => {
+  }, [projects]);
+
+  if (!user || loading) {
+    return <div>Loading...</div>;
+  }
+
+  const hasProjects = projects && projects.length > 0;
+
 
   return (
     <div className="container p-8 mx-auto">
@@ -29,43 +54,44 @@ export default function DashboardPage() {
           <p className="text-gray-600 mb-4">
             Create your first project to start finding citations
           </p>
-          <Link href="/dashboard/add-project">
+          <Link href="/dashboard/new-project">
             <Button variant="default">Create New Project</Button>
           </Link>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {DUMMY_PROJECTS.map((project) => (
-            <div
+          {projects.map((project) => (
+            <Link
+              href={`/dashboard/project/${project.id}`}
               key={project.id}
-              className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              className="block"
             >
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">
-                {project.title}
-              </h3>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {project.keywords.map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <IconBooks size={16} />
-                  <span>{project.citationCount} citations</span>
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer">
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                  {project.title}
+                </h3>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {formatKeywords(project.keywords).map((keyword, idx) => (
+                    <span
+                      key={`${keyword}-${idx}`}
+                      className="px-2 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
                 </div>
-                <div className="flex items-center gap-1">
-                  <IconClock size={16} />
-                  <span>
-                    {new Date(project.createdAt).toLocaleDateString()}
-                  </span>
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <IconBooks size={16} />
+                    <span>{project.citationCount || 0} citations</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <IconClock size={16} />
+                    <span>{new Date().toLocaleDateString()}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

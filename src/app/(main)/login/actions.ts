@@ -11,14 +11,22 @@ export async function login(formData: FormData) {
   const password = formData.get("password") as string;
 
   if (!email || !password) {
-    redirect('/login?toast_type=destructive&toast_title=Error&toast_message=Email and password are required');
+    redirect(
+      "/login?toast_type=destructive&toast_title=Error&toast_message=Email and password are required"
+    );
   }
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    redirect(`/login?toast_type=destructive&toast_title=Error&toast_message=${encodeURIComponent(error.message)}`);
+    redirect(
+      `/login?toast_type=destructive&toast_title=Error&toast_message=${encodeURIComponent(
+        error.message
+      )}`
+    );
   }
 
   revalidatePath("/", "layout");
-  redirect(`/?toast_type=success&toast_title=Welcome back!&toast_message=Successfully logged in as ${email}`);
+  redirect(
+    `/?toast_type=success&toast_title=Welcome back!&toast_message=Successfully logged in as ${email}`
+  );
 }

@@ -9,7 +9,6 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sparkles } from "lucide-react";
 
@@ -75,15 +74,7 @@ export default function DashboardSidebar() {
             link={{
               label: `Logged in as: \n${user?.email}` || "User",
               href: "#",
-              icon: (
-                <Image
-                  src="https://assets.aceternity.com/manu.png"
-                  className="h-7 w-7 flex-shrink-0 rounded-full"
-                  width={50}
-                  height={50}
-                  alt="Avatar"
-                />
-              ),
+              icon: <div className="rounded-full size-6 bg-green-500"> </div>,
             }}
           />
         </div>
@@ -91,14 +82,3 @@ export default function DashboardSidebar() {
     </Sidebar>
   );
 }
-
-// export const LogoIcon = () => {
-//   return (
-//     <Link
-//       href="#"
-//       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20 h-8"
-//     >
-//       <Sparkles size={24} className="fill-primary text-primary" />
-//     </Link>
-//   );
-// };

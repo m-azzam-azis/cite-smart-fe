@@ -11,9 +11,6 @@ export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const passwordConfirm = formData.get("password-confirm") as string;
-  console.log(email);
-  console.log(password);
-  console.log(passwordConfirm);
 
   if (!email || !password || !passwordConfirm) {
     redirect("/signup?status=error&message=Email and password are required.");
