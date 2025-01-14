@@ -1,6 +1,7 @@
 import { signup } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import JudgeLogin from "@/components/elements/JudgeLogin";
 
 export default function SignupPage() {
   return (
@@ -65,6 +66,7 @@ export default function SignupPage() {
             Sign Up
           </Button>
         </form>
+        <JudgeLogin />
       </div>
     </div>
   );
