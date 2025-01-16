@@ -6,7 +6,6 @@ import { login } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToastHandler } from "@/lib/toast-handler";
-import JudgeLogin from "@/components/elements/JudgeLogin";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -72,7 +71,6 @@ export default function LoginPage() {
             Log in
           </Button>
         </form>
-        <JudgeLogin />
       </div>
       <ToastHandler />
     </div>
